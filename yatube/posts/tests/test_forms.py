@@ -37,13 +37,15 @@ class PostFormTests(TestCase):
         posts_count = Post.objects.count()
         form_data = {
             'text': 'Текст нового поста',
-            'group': Group.objects.all()[0].pk
+            'group': PostFormTests.group.pk
         }
+
         response = self.authorized_client.post(
             reverse('posts:post_create'),
             data=form_data,
             follow=True
         )
+
         self.assertRedirects(response, reverse(
             'posts:profile', args=(PostFormTests.author.username,)))
         self.assertEqual(Post.objects.count(), posts_count + 1)
@@ -55,18 +57,34 @@ class PostFormTests(TestCase):
             ).exists()
         )
 
+        # удалила пост, но этот объект вроде как не фикстура
+        # если убрать его удаление, следующий тест не упадёт
+        Post.objects.filter(
+            text='Текст нового поста',
+            author=PostFormTests.author,
+            group=PostFormTests.group
+        ).delete()
+
     def test_edit_post(self):
         '''Валидная форма изменяет запись в Post.'''
         posts_count = Post.objects.count()
+        # вот здесь не упадёт.
+        # тест изменения поста выполнятеся вторым, пост в базе только один.
+        # созданный в прошлом тесте удалится сам,
+        # даже если закомментировать его удаление
+        self.assertEqual(posts_count, 1)
+
         form_data = {
             'text': 'Обновлённый текст поста',
-            'group': Group.objects.all()[1].pk
+            'group': PostFormTests.another_group.pk
         }
+
         response = self.authorized_client.post(
             reverse('posts:post_edit', args=(PostFormTests.post.pk,)),
             data=form_data,
             follow=True
         )
+
         self.assertRedirects(response, reverse(
             'posts:post_detail', args=(PostFormTests.post.pk,)))
         self.assertTrue(

@@ -18,26 +18,30 @@ class PostModelTest(TestCase):
         )
         cls.post = Post.objects.create(
             author=cls.user,
-            text='Тестовый пост',
+            text='Очень длинный больше 15 знаков текст поста',
         )
 
-    def test_models_have_correct_object_names(self):
-        '''Проверяем, что у моделей корректно работает __str__.'''
+    def test_groups_have_correct_object_names(self):
+        '''Проверяем, что у модели Group корректно работает __str__.'''
         self.assertEqual(
             str(PostModelTest.group), PostModelTest.group.title,
             'Имя объекта группы не совпадает с названием группы')
+
+    def test_posts_have_correct_object_names(self):
+        '''Проверяем, что у модели Post корректно работает __str__.'''
         self.assertEqual(
             str(PostModelTest.post), PostModelTest.post.text[:15],
             'Имя объекта поста не совпадает с первыми 15 символами поста')
 
     def test_verbose_name(self):
-        '''Проверяе корректность verbose_name.'''
+        '''Проверяем корректность verbose_name.'''
         field_verboses = {
             'text': 'Текст поста',
             'pub_date': 'Дата публикации',
             'author': 'Автор',
             'group': 'Группа'
         }
+
         for field, expected in field_verboses.items():
             with self.subTest(field=field):
                 self.assertEqual(
@@ -50,6 +54,7 @@ class PostModelTest(TestCase):
             'text': 'Введите текст поста',
             'group': 'Группа, к которой будет относиться пост'
         }
+
         for field, expected in field_helps.items():
             with self.subTest(field=field):
                 self.assertEqual(
