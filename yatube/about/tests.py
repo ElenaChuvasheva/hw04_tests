@@ -1,30 +1,31 @@
 from http import HTTPStatus
 
 from django.test import Client, TestCase
-from django.urls import reverse
 
 
 class AboutURLTests(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        cls.about_url = '/about/author/'
+        cls.tech_url = '/about/tech/'
         cls.templates_url_names = {
-            reverse('about:author'): 'about/author.html',
-            reverse('about:tech'): 'about/tech.html'
+            cls.about_url: 'about/author.html',
+            cls.tech_url: 'about/tech.html'
         }
 
     def setUp(self):
         self.guest_client = Client()
 
     def test_about_author_url_exists_at_desired_location(self):
-        '''Страница /about/author/ доступна любому пользователю.'''
-        response = self.guest_client.get(reverse('about:author'))
+        '''Страница с данными об авторе доступна любому пользователю.'''
+        response = self.guest_client.get(AboutURLTests.about_url)
 
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_about_tech_url_exists_at_desired_location(self):
-        '''Страница /about/tech/ доступна любому пользователю.'''
-        response = self.guest_client.get(reverse('about:tech'))
+        '''Страница с данными о технологиях доступна любому пользователю.'''
+        response = self.guest_client.get(AboutURLTests.tech_url)
 
         self.assertEqual(response.status_code, HTTPStatus.OK)
 

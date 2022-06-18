@@ -8,10 +8,6 @@ from ..models import Group, Post
 
 POSTS_GROUP = 11
 POSTS_ANOTHER_GROUP = 2
-POSTS_SUM = POSTS_GROUP + POSTS_ANOTHER_GROUP
-POSTS_INDEX_PAGE2 = POSTS_SUM - settings.POSTS_PER_PAGE
-POSTS_GROUP_PAGE2 = POSTS_GROUP - settings.POSTS_PER_PAGE
-POSTS_PROFILE_PAGE2 = POSTS_SUM - settings.POSTS_PER_PAGE
 
 User = get_user_model()
 
@@ -115,16 +111,21 @@ class PostsPagesTests(TestCase):
 
     def test_second_paginator_page(self):
         '''Проверка: правильное количество постов на 2-й стр. пагинатора.'''
+        posts_sum = POSTS_GROUP + POSTS_ANOTHER_GROUP
+        posts_index_page2 = posts_sum - settings.POSTS_PER_PAGE
+        posts_group_page2 = POSTS_GROUP - settings.POSTS_PER_PAGE
+        posts_profile_page2 = posts_sum - settings.POSTS_PER_PAGE
+
         reverse_posts = {
-            reverse('posts:index'): POSTS_INDEX_PAGE2,
+            reverse('posts:index'): posts_index_page2,
             reverse(
                 'posts:group_list',
                 args=(PostsPagesTests.group.slug,)):
-            POSTS_GROUP_PAGE2,
+            posts_group_page2,
             reverse(
                 'posts:profile',
                 args=(PostsPagesTests.author.username,)):
-            POSTS_PROFILE_PAGE2
+            posts_profile_page2
         }
 
         for reverse_name, number_of_posts in reverse_posts.items():
@@ -203,8 +204,6 @@ class PostsPagesTests(TestCase):
                 last_post = response.context.get('page_obj')[0]
                 self.assertEqual(last_post, new_post)
 
-        new_post.delete()
-
     def test_new_post_not_in_another_group(self):
         '''Новый пост в группе не попадает на страницу другой группы.'''
         new_post = Post.objects.create(
@@ -218,5 +217,3 @@ class PostsPagesTests(TestCase):
 
         for post in response.context.get('page_obj'):
             self.assertNotEqual(post.text, new_post.text)
-
-        new_post.delete()
