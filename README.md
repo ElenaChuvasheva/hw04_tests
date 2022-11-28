@@ -32,3 +32,8 @@ cd .\yatube\
 ```
 python manage.py migrate
 ```
+Запуск тестов:
+```
+python manage.py test
+```
+Тесты находятся в папке hw04_tests\yatube\posts\tests.
